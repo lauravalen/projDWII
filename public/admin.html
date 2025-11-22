@@ -5,11 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
-    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/admin.js"></script>
 </head>
 <body>
     
+    <div class="container" id="tela-login">
+        <h1>🔒 Acesso Restrito</h1>
+        <div class="form-box">
+            <input type="email" id="email" placeholder="Email de Admin">
+            <input type="password" id="senha" placeholder="Senha">
+            <div class="botoes">
+                <button onclick="fazerLogin()">Entrar</button>
+                <button onclick="fazerRegistro()" class="btn-secundario">Criar Conta</button>
+            </div>
+        </div>
+        <br>
+        <a href="index.html">← Voltar para o Cassino</a>
+    </div>
 
+    <div class="container escondido" id="tela-gestao">
+        <div class="header-admin">
+            <h1>🛠️ Gerenciar Acervo</h1>
+            <button onclick="sair()" class="btn-sair">Sair</button>
+        </div>
+
+        <div class="form-box">
+            <h3>Cadastrar Novo Item</h3>
+            
+            <label>O que você vai cadastrar?</label>
+            <select id="tipo-item">
+                <option value="livros">Livro</option>
+                <option value="cds">CD</option>
+                <option value="dvds">DVD</option>
+            </select>
+
+            <input type="text" id="titulo" placeholder="Título da Obra">
+            <input type="number" id="preco" placeholder="Preço (R$)">
+            
+            <input type="text" id="autor-id" placeholder="ID do Autor (Cole aqui)">
+            <small style="color: #aaa; font-size: 12px;">(Dica: Crie um autor primeiro no Postman ou peça para eu te ensinar a criar a rota de autores)</small>
+
+            <button onclick="cadastrarItem()">💾 Salvar no Banco</button>
+        </div>
+    </div>
     
 </body>
 </html>
