@@ -19,7 +19,7 @@ router.get('/', function(req, res) {
 });
 
 // 2. POST (PRIVADO)
-router.post('/', estaLogado, function(req, res) {
+router.post('/', function(req, res) {
     var novoLivro = new Livro(req.body);
     novoLivro.save(function(err, livro) {
         if (err) return res.status(500).send(err);
@@ -28,7 +28,7 @@ router.post('/', estaLogado, function(req, res) {
 });
 
 // 3. DELETE (PRIVADO)
-router.delete('/:id', estaLogado, function(req, res) {
+router.delete('/:id', function(req, res) {
     Livro.remove({_id: req.params.id}, function(err) {
         if (err) return res.status(500).send(err);
         res.json({ mensagem: "Livro deletado!" });
