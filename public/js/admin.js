@@ -18,20 +18,52 @@ async function fazerLogin() {
     }
 }
 
+async function fazerLogin() {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    try {
+        const resposta = await fetch('/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, senha: senha })
+        });
+
+        const dados = await resposta.json();
+
+        if (resposta.ok) {
+            alert("Login realizado!");
+            mostrarPainel();
+        } else {
+            // Mostra o erro exato que o servidor mandou
+            alert("Erro: " + dados.erro);
+        }
+    } catch (e) {
+        alert("Erro de conexão. O servidor/banco está rodando?");
+    }
+}
+
 async function fazerRegistro() {
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
-    const resposta = await fetch('/users/registro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, senha: senha })
-    });
+    try {
+        const resposta = await fetch('/users/registro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, senha: senha })
+        });
 
-    if (resposta.ok) {
-        alert("Conta criada! Agora faça login.");
-    } else {
-        alert("Erro ao criar conta. Email já existe?");
+        const dados = await resposta.json();
+
+        if (resposta.ok) {
+            alert("Conta criada com sucesso! Já pode cadastrar livros.");
+            mostrarPainel(); // Já entra direto
+        } else {
+            alert("Erro: " + dados.erro);
+        }
+    } catch (e) {
+        alert("Erro de conexão. Verifique o terminal.");
     }
 }
 

@@ -11,8 +11,10 @@ var session = require('express-session');
 // 1. Carregar configuração do Banco
 var configDB = require('./config/database');
 
-// 2. Conectar no MongoDB
-mongoose.connect(configDB.url); 
+// 2. Conectar no MongoDB com aviso
+mongoose.connect(configDB.url)
+    .then(() => console.log("✅ SUCESSO: O BANCO DE DADOS CONECTOU!"))
+    .catch(erro => console.log("❌ ERRO CRÍTICO: O BANCO NÃO CONECTOU!", erro));
 
 // 3. Configurar o Passport
 require('./config/passport')(passport);
