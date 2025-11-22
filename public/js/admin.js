@@ -22,7 +22,7 @@ async function fazerRegistro() {
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
-    const resposta = await fetch('/users/registro', { // Note que mudei para 'signup' conforme seu users.js
+    const resposta = await fetch('/users/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, senha: senha })
