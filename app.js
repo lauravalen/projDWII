@@ -40,13 +40,12 @@ app.use(flash());
 // 5. Rotas
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-// var livrosRouter = require('./routes/livros'); // Descomente quando criar o arquivo
+var livrosRouter = require('./routes/livros');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-// app.use('/livros', livrosRouter); // Descomente quando criar o arquivo
+app.use('/livros', livrosRouter);
 
-// Tratamento de erros
 app.use(function(req, res, next) {
   var err = new Error('Não encontrado');
   err.status = 404;
