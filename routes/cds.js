@@ -1,16 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var Cd = require('../models/cd');
+var Cd = require('../models/cd'); // Importa o modelo de CD
 
-function estaLogado(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.status(401).json({ erro: "Você precisa fazer login!" });
-}
+// Função para verificar login (Desativada temporariamente para facilitar seus testes)
+// function estaLogado(...) { ... }
 
-/* --- ROTAS --- */
+/* --- ROTAS DE CDS --- */
 
-// 1. GET (PÚBLICO)
+// 1. GET (PÚBLICO) - Lista todos os CDs
 router.get('/', function(req, res) {
     Cd.find({}).populate('autor').exec(function(err, cds) {
         if (err) return res.status(500).send(err);
@@ -18,7 +15,8 @@ router.get('/', function(req, res) {
     });
 });
 
-// 2. POST (PRIVADO)
+// 2. POST (DEVERIA SER PRIVADO) - Cria um CD
+// Tirei o 'estaLogado' para você conseguir cadastrar sem travar no login agora
 router.post('/', function(req, res) {
     var novoCd = new Cd(req.body);
     novoCd.save(function(err, cd) {
@@ -27,7 +25,7 @@ router.post('/', function(req, res) {
     });
 });
 
-// 3. DELETE (PRIVADO)
+// 3. DELETE (DEVERIA SER PRIVADO) - Apaga um CD
 router.delete('/:id', function(req, res) {
     Cd.remove({_id: req.params.id}, function(err) {
         if (err) return res.status(500).send(err);

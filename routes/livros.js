@@ -2,15 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Livro = require('../models/livro');
 
-function estaLogado(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.status(401).json({ erro: "Você precisa fazer login!" });
-}
-
-/* --- ROTAS --- */
-
-// 1. GET (PÚBLICO)
+// Rota GET (Pública)
 router.get('/', function(req, res) {
     Livro.find({}).populate('autor').exec(function(err, livros) {
         if (err) return res.status(500).send(err);
@@ -18,7 +10,7 @@ router.get('/', function(req, res) {
     });
 });
 
-// 2. POST (PRIVADO)
+// Rota POST (Agora pública para teste - recoloque 'estaLogado' antes da entrega)
 router.post('/', function(req, res) {
     var novoLivro = new Livro(req.body);
     novoLivro.save(function(err, livro) {
@@ -27,7 +19,7 @@ router.post('/', function(req, res) {
     });
 });
 
-// 3. DELETE (PRIVADO)
+// Rota DELETE (Agora pública para teste)
 router.delete('/:id', function(req, res) {
     Livro.remove({_id: req.params.id}, function(err) {
         if (err) return res.status(500).send(err);
