@@ -1,38 +1,33 @@
-var express = require('express');
-var router = express.Router();
-var Dvd = require('../models/dvd');
+// routes/dvds.js
+const express = require('express');
+const router = express.Router();
+const Dvd = require('../models/Dvd');
+const { ensureAuth } = require('./_middleware');
 
-function estaLogado(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.status(401).json({ erro: "Você precisa fazer login!" });
-}
-
-/* --- ROTAS --- */
-
-// 1. GET (PÚBLICO)
-router.get('/', function(req, res) {
-    Dvd.find({}).populate('autor').exec(function(err, dvds) {
-        if (err) return res.status(500).send(err);
-        res.json(dvds);
-    });
+router.get('/', async (req, res) => {
+  const items = await Dvd.find().populate('author');
+  res.json(items);
 });
 
-// 2. POST (PRIVADO)
-router.post('/', function(req, res) {
-    var novoDvd = new Dvd(req.body);
-    novoDvd.save(function(err, dvd) {
-        if (err) return res.status(500).send(err);
-        res.json(dvd);
-    });
+router.get('/:id', async (req, res) => {
+  const item = await Dvd.findById(req.params.id).populate('author');
+  if (!item) return res.status(404).json({ erro: 'DVD não encontrado' });
+  res.json(item);
 });
 
-// 3. DELETE (PRIVADO)
-router.delete('/:id', function(req, res) {
-    Dvd.remove({_id: req.params.id}, function(err) {
-        if (err) return res.status(500).send(err);
-        res.json({ mensagem: "DVD deletado!" });
-    });
+router.post('/', ensureAuth, async (req, res) => {
+  const item = await Dvd.create(req.body);
+  res.status(201).json(item);
+});
+
+router.put('/:id', ensureAuth, async (req, res) => {
+  const item = await Dvd.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(item);
+});
+
+router.delete('/:id', ensureAuth, async (req, res) => {
+  await Dvd.findByIdAndDelete(req.params.id);
+  res.status(204).end();
 });
 
 module.exports = router;

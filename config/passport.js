@@ -1,55 +1,67 @@
-var LocalStrategy = require('passport-local').Strategy;
-var Usuario = require('../models/user');
+// config/passport.js
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const bcrypt = require('bcryptjs');
 
-module.exports = function(passport) {
+const User = require('../models/User');
 
-    passport.serializeUser(function(user, done) {
-        done(null, user.id);
-    });
-    passport.deserializeUser(function(id, done) {
-        Usuario.findById(id, function(err, user) {
-            done(err, user);
-        });
-    });
+// Local strategy
+passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return done(null, false, { message: 'Usuário não encontrado' });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return done(null, false, { message: 'Senha inválida' });
+    return done(null, user);
+  } catch (err) {
+    return done(err);
+  }
+}));
 
-    //REGISTRO
-    passport.use('local-registro', new LocalStrategy({
-        usernameField: 'email',
-        passwordField: 'senha',
-        passReqToCallback: true
-    },
-    function(req, email, senha, done) {
-        process.nextTick(function() {
-            Usuario.findOne({ 'local.email': email }, function(err, user) {
-                if (err) return done(err);
-                if (user) {
-                    return done(null, false, req.flash('mensagem', 'Esse email já existe.'));
-                } else {
-                    var novoUsuario = new Usuario();
-                    novoUsuario.local.email = email;
-                    novoUsuario.local.senha = novoUsuario.gerarHash(senha); // Criptografa
+// Google strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const googleId = profile.id;
+    let user = await User.findOne({ googleId });
+    if (!user) {
+      // try by email
+      const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+      user = await User.findOne({ email });
+    }
+    if (!user) {
+      const nome = profile.displayName || 'Usuário Google';
+      const email = profile.emails && profile.emails[0] && profile.emails[0].value || '';
+      user = await User.create({
+        googleId,
+        nome,
+        email,
+        password: '' // senha vazia para usuários google
+      });
+    } else if (!user.googleId) {
+      // vincula conta existente com googleId se não tiver
+      user.googleId = googleId;
+      await user.save();
+    }
+    return done(null, user);
+  } catch (err) {
+    return done(err);
+  }
+}));
 
-                    novoUsuario.save(function(err) {
-                        if (err) throw err;
-                        return done(null, novoUsuario);
-                    });
-                }
-            });
-        });
-    }));
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
 
-    //LOGIN
-    passport.use('local-login', new LocalStrategy({
-        usernameField: 'email',
-        passwordField: 'senha',
-        passReqToCallback: true
-    },
-    function(req, email, senha, done) {
-        Usuario.findOne({ 'local.email': email }, function(err, user) {
-            if (err) return done(err);
-            if (!user) return done(null, false, req.flash('mensagem', 'Usuário não encontrado.'));
-            if (!user.validarSenha(senha)) return done(null, false, req.flash('mensagem', 'Senha incorreta.'));
-            return done(null, user);
-        });
-    }));
-};
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id).lean();
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});

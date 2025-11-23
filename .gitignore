@@ -1,0 +1,9 @@
+# Ignorar o arquivo de senhas (CRÍTICO)
+.env
+
+# Ignorar as bibliotecas pesadas (o projeto baixa isso sozinho com npm install)
+node_modules/
+
+# Ignorar arquivos de sistema e logs
+.DS_Store
+npm-debug.log

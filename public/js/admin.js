@@ -1,112 +1,110 @@
-// Funções de Autenticação
-async function fazerLogin() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
+// public/js/admin.js
 
-    // Manda os dados para a rota que criamos no 'routes/users.js'
-    const resposta = await fetch('/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, senha: senha })
+// Faz login com email/senha
+async function fazerLogin() {
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
+
+  try {
+    const resposta = await fetch('http://localhost:3000/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, senha })
     });
 
+    const dados = await resposta.json();
+
     if (resposta.ok) {
-        alert("Login realizado!");
-        mostrarPainel(); // Troca a tela
+      alert('Login realizado!');
+      mostrarPainel();
     } else {
-        alert("Erro no login. Verifique email e senha.");
+      alert('Erro: ' + (dados.erro || 'Credenciais inválidas'));
     }
+  } catch (e) {
+    alert('Erro de conexão. O servidor está rodando?');
+  }
 }
 
-async function fazerLogin() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-
-    try {
-        const resposta = await fetch('/users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, senha: senha })
-        });
-
-        const dados = await resposta.json();
-
-        if (resposta.ok) {
-            alert("Login realizado!");
-            mostrarPainel();
-        } else {
-            // Mostra o erro exato que o servidor mandou
-            alert("Erro: " + dados.erro);
-        }
-    } catch (e) {
-        alert("Erro de conexão. O servidor/banco está rodando?");
-    }
-}
-
+// Faz registro
 async function fazerRegistro() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
+  const email = document.getElementById('email').value;
+  const senha = document.getElementById('senha').value;
+  const nome = document.getElementById('nome') ? document.getElementById('nome').value : '';
 
-    try {
-        const resposta = await fetch('/users/registro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, senha: senha })
-        });
+  try {
+    const resposta = await fetch('http://localhost:3000/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, senha, nome })
+    });
 
-        const dados = await resposta.json();
+    const dados = await resposta.json();
 
-        if (resposta.ok) {
-            alert("Conta criada com sucesso! Já pode cadastrar livros.");
-            mostrarPainel(); // Já entra direto
-        } else {
-            alert("Erro: " + dados.erro);
-        }
-    } catch (e) {
-        alert("Erro de conexão. Verifique o terminal.");
+    if (resposta.ok) {
+      alert('Conta criada com sucesso!');
+      mostrarPainel();
+    } else {
+      alert('Erro: ' + (dados.erro || 'Não foi possível criar a conta'));
     }
+  } catch (e) {
+    alert('Erro de conexão. Verifique o terminal.');
+  }
 }
 
-// Função de Cadastro de Itens (Livros, CDs, DVDs)
+// Botão Google
+const googleBtn = document.getElementById('googleBtn');
+if (googleBtn) {
+  googleBtn.addEventListener('click', () => {
+    window.location.href = 'http://localhost:3000/auth/google';
+  });
+}
+
+// Cadastrar item (livro/cd/dvd)
 async function cadastrarItem() {
-    const tipo = document.getElementById("tipo-item").value; // 'livros', 'cds' ou 'dvds'
-    const titulo = document.getElementById("titulo").value;
-    const preco = document.getElementById("preco").value;
-    const autorId = document.getElementById("autor-id").value;
+  const tipo = document.getElementById('tipo-item').value;
+  const titulo = document.getElementById('titulo').value;
+  const preco = parseFloat(document.getElementById('preco').value) || 0;
+  const autorId = document.getElementById('autor-id').value;
 
-    // Monta o objeto igual ao modelo do Mongoose
-    const dados = {
-        titulo: titulo,
-        preco: preco,
-        autor: autorId // Precisa ser um ID válido de autor existente no banco
-    };
+  const dados = { title: titulo, price: preco, author: autorId };
 
-    const resposta = await fetch(`/${tipo}`, { // Ex: POST /livros
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
+  try {
+    const resposta = await fetch(`http://localhost:3000/${tipo}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(dados)
     });
 
     if (resposta.ok) {
-        alert("Item cadastrado com sucesso!");
-        document.getElementById("titulo").value = ""; // Limpa o campo
+      alert('Item cadastrado com sucesso!');
+      document.getElementById('titulo').value = '';
     } else {
-        // Se der erro 401, é porque a sessão caiu
-        if (resposta.status === 401) {
-            alert("Sessão expirada. Faça login novamente.");
-            location.reload();
-        } else {
-            alert("Erro ao cadastrar. Verifique se o ID do autor é válido.");
-        }
+      if (resposta.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        location.reload();
+      } else {
+        const err = await resposta.json();
+        alert('Erro: ' + (err.erro || 'Falha ao cadastrar'));
+      }
     }
+  } catch (e) {
+    alert('Erro de conexão.');
+  }
 }
 
-// Funções Visuais
+// Mostrar painel
 function mostrarPainel() {
-    document.getElementById("tela-login").classList.add("escondido");
-    document.getElementById("tela-gestao").classList.remove("escondido");
+  const telaLogin = document.getElementById('tela-login');
+  const telaGestao = document.getElementById('tela-gestao');
+  if (telaLogin) telaLogin.classList.add('escondido');
+  if (telaGestao) telaGestao.classList.remove('escondido');
 }
 
+// Sair
 function sair() {
-    fetch('/users/logout').then(() => location.reload());
+  fetch('http://localhost:3000/users/logout', { credentials: 'include' })
+    .then(() => location.reload());
 }

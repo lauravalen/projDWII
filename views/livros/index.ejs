@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerenciador de Obras</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Adicionar Nova Obra</h1>
+    
+    <% if (typeof msg !== 'undefined') { %>
+        <p style="color: green;"><%= msg %></p>
+    <% } %>
+
+    <form action="/salvar-obra" method="POST">
+        <div>
+            <label>Título da Obra:</label>
+            <input type="text" name="titulo" required placeholder="Ex: O Senhor dos Anéis">
+        </div>
+        <br>
+
+        <div>
+            <label>Nome do Autor/Artista:</label>
+            <input type="text" name="nomeAutor" required placeholder="Ex: J.R.R. Tolkien">
+        </div>
+        <br>
+
+        <div>
+            <label>Tipo de Mídia:</label>
+            <select name="tipo" required>
+                <option value="Livro">Livro</option>
+                <option value="CD">CD</option>
+                <option value="DVD">DVD</option>
+            </select>
+        </div>
+        <br>
+
+        <button type="submit">Salvar</button>
+    </form>
+
+    <hr>
+    
+    <h2>Ver Cadastros</h2>
+    <a href="/livros">Ver Livros</a> | 
+    <a href="/cds">Ver CDs</a> | 
+    <a href="/dvds">Ver DVDs</a> | 
+    <a href="/autores">Ver Autores</a>
+</body>
+</html>

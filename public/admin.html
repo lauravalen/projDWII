@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Cadastro</title>
 
     <link rel="stylesheet" href="css/style.css">
     <script src="js/admin.js"></script>
@@ -12,13 +12,24 @@
     
     <div class="container" id="tela-login">
         <h1>🔒 Acesso Restrito</h1>
-        <div class="form-box">
+
+        <!-- <button id="googleBtn" class="btn-google">
+            <img src="google-icon.png" style="width:18px; margin-right:5px;">
+            Entrar com Google
+        </button> -->
+        <button onclick="fazerLogin()">Entrar</button>
+        <button onclick="fazerRegistro()">Criar Conta</button>
+        <button id="googleBtn">Entrar com Google</button>
+
+
+
+        <!-- <div class="form-box">
             <input type="email" id="email" placeholder="Email de Admin">
             <input type="password" id="senha" placeholder="Senha">
             <div class="botoes">
                 <button onclick="fazerLogin()">Entrar</button>
                 <button onclick="fazerRegistro()" class="btn-secundario">Criar Conta</button>
-            </div>
+            </div> -->
         </div>
         <br>
         <a href="index.html">← Voltar para o Cassino</a>

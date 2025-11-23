@@ -1,55 +1,90 @@
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash = require('connect-flash');
-var session = require('express-session');
+// app.js
+require('dotenv').config();
 
-// 1. Carregar configuração do Banco
-var configDB = require('./config/database');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const mongoose = require('mongoose');
 
-// 2. Conectar no MongoDB com aviso
-mongoose.connect(configDB.url)
-    .then(() => console.log("✅ SUCESSO: O BANCO DE DADOS CONECTOU!"))
-    .catch(erro => console.log("❌ ERRO CRÍTICO: O BANCO NÃO CONECTOU!", erro));
+const indexRouter = require('./routes/index'); // se existir
+const usersRouter = require('./routes/users');
+const livrosRouter = require('./routes/livros');
+const cdsRouter = require('./routes/cds');
+const dvdsRouter = require('./routes/dvds');
+const autoresRouter = require('./routes/autores');
+const authRouter = require('./routes/auth');
 
-// 3. Configurar o Passport
-require('./config/passport')(passport);
+const app = express();
 
-var app = express();
+// Conexão com MongoDB (projeto usa projDWII)
+async function conectarDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/projDWII');
+    console.log('MongoDB conectado com sucesso!');
+  } catch (erro) {
+    console.error('❌ Erro ao conectar MongoDB:', erro);
+    process.exit(1);
+  }
+}
+conectarDB();
 
-// Configuração da View Engine
+// view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// middlewares
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 4. Configuração OBRIGATÓRIA para Login
-app.use(session({ secret: 'segredo-cassino', resave: false, saveUninitialized: true }));
+// session + passport (ordem importa)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'segredo_super_secreto_dwii',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { /* secure:false for dev */ }
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
+require('./config/passport'); // carrega strategies
 
-// 5. Rotas
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var livrosRouter = require('./routes/livros');
+// expõe req.user para views
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user || null;
+  next();
+});
 
-app.use('/', indexRouter);
+// rotas
+app.use('/', indexRouter); // se indexRouter existir, senão ignore
 app.use('/users', usersRouter);
+app.use('/auth', authRouter);
 app.use('/livros', livrosRouter);
+app.use('/cds', cdsRouter);
+app.use('/dvds', dvdsRouter);
+app.use('/autores', autoresRouter);
 
+// catch 404
 app.use(function(req, res, next) {
-  var err = new Error('Não encontrado');
-  err.status = 404;
-  next(err);
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+  // se quiser retornar JSON para API:
+  if (req.originalUrl.startsWith('/api') || req.headers.accept?.includes('application/json')) {
+    return res.json({ error: err.message });
+  }
+  res.render('error');
 });
 
 module.exports = app;

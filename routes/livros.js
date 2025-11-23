@@ -1,38 +1,29 @@
-var express = require('express');
-var router = express.Router();
-var Livro = require('../models/livro');
+const express = require('express');
+const router = express.Router();
 
-function estaLogado(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.status(401).json({ erro: "Você precisa fazer login!" });
-}
+const {
+    listarLivros,
+    buscarLivroPorId,
+    criarLivro,
+    atualizarLivro,
+    deletarLivro
+} = require('../controllers/livroController');
 
-/* --- ROTAS --- */
+// Rotas
 
-// 1. GET (PÚBLICO)
-router.get('/', function(req, res) {
-    Livro.find({}).populate('autor').exec(function(err, livros) {
-        if (err) return res.status(500).send(err);
-        res.json(livros);
-    });
-});
+// LISTAR
+router.get('/', listarLivros);
 
-// 2. POST (PRIVADO)
-router.post('/', function(req, res) {
-    var novoLivro = new Livro(req.body);
-    novoLivro.save(function(err, livro) {
-        if (err) return res.status(500).send(err);
-        res.json(livro);
-    });
-});
+// BUSCAR POR ID
+router.get('/:id', buscarLivroPorId);
 
-// 3. DELETE (PRIVADO)
-router.delete('/:id', function(req, res) {
-    Livro.remove({_id: req.params.id}, function(err) {
-        if (err) return res.status(500).send(err);
-        res.json({ mensagem: "Livro deletado!" });
-    });
-});
+// CRIAR
+router.post('/', criarLivro);
+
+// ATUALIZAR
+router.put('/:id', atualizarLivro);
+
+// DELETAR
+router.delete('/:id', deletarLivro);
 
 module.exports = router;

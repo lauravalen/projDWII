@@ -1,10 +1,13 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+// models/Dvd.js
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var dvdSchema = new Schema({
-    titulo: { type: String, required: true },
-    autor: { type: mongoose.Schema.Types.ObjectId, ref: 'Autor', required: true },
-    ano: { type: Number }
+const DvdSchema = new Schema({
+  title: { type: String, required: true },
+  year: Number,
+  price: Number,
+  author: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Dvd', dvdSchema);
+module.exports = mongoose.models.Dvd || mongoose.model('Dvd', DvdSchema);
