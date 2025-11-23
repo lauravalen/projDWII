@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // models/User.js
 const mongoose = require('mongoose');
 
@@ -10,3 +11,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
+=======
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+    googleId: String,
+    nome: String,
+    email: String
+});
+
+module.exports = mongoose.model('User', UserSchema);
+>>>>>>> 70fd03474d969b48407c17c2dd6cc3a2ef45c436

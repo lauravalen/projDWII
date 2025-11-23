@@ -8,6 +8,7 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^17.2.3",
@@ -17,6 +18,20 @@
     "mongoose": "^8.7.0",
     "morgan": "^1.10.0",
     "passport": "^0.6.0",
+=======
+    "bcrypt-nodejs": "^0.0.3",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^17.2.3",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.18.2",
+    "http-errors": "~1.6.3",
+    "mongoose": "^9.0.0",
+    "morgan": "~1.9.1",
+    "passport": "^0.7.0",
+>>>>>>> 70fd03474d969b48407c17c2dd6cc3a2ef45c436
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0"
   },

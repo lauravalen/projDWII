@@ -4,8 +4,13 @@ var router = express.Router();
 // Importar TODOS os modelos necessários
 var Autor = require('../models/autor');
 var Livro = require('../models/livro');
+<<<<<<< HEAD
 var CD = require('../models/Cd');
 var DVD = require('../models/Dvd');
+=======
+var CD = require('../models/cd');
+var DVD = require('../models/dvd');
+>>>>>>> 70fd03474d969b48407c17c2dd6cc3a2ef45c436
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
