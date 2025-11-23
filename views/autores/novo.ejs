@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastrar Autor</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Novo Autor</h1>
+    <p>Cadastre um autor para poder associá-lo aos seus livros.</p>
+
+    <form action="/autores" method="POST">
+        <div>
+            <label>Nome do Autor:</label>
+            <input type="text" name="nome" required placeholder="Ex: J.K. Rowling">
+        </div>
+        
+        <div>
+            <label>Nacionalidade:</label>
+            <input type="text" name="nacionalidade" placeholder="Ex: Britânica">
+        </div>
+
+        <br>
+        <button type="submit">Salvar Autor</button>
+    </form>
+
+    <br>
+    <a href="/livros">Voltar para lista de livros</a>
+</body>
+</html>

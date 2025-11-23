@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Livros</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Catálogo de Livros</h1>
+    
+    <% if (user) { %>
+        <a href="/livros/novo" class="btn">Cadastrar Novo Livro</a>
+        <a href="/logout">Sair</a>
+    <% } else { %>
+        <p>Faça login para cadastrar.</p>
+        <a href="/auth/google">Entrar com Google</a>
+    <% } %>
+
+    <ul>
+        <% livros.forEach(function(livro) { %>
+            <li>
+                <strong><%= livro.titulo %></strong> - 
+                Autor: <%= livro.autor ? livro.autor.nome : 'Desconhecido' %>
+                
+                <% if (user) { %>
+                    <a href="/livros/delete/<%= livro._id %>">[Apagar]</a>
+                <% } %>
+            </li>
+        <% }); %>
+    </ul>
+    
+    <a href="/">Voltar para Home</a>
+</body>
+</html>

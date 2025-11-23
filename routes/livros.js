@@ -1,30 +1,56 @@
 var express = require('express');
 var router = express.Router();
+// Importar os modelos e o middleware de segurança
 var Livro = require('../models/livro');
+var Autor = require('../models/autor');
+var { checarAutenticacao } = require('../middleware/auth'); // Importa a função que criamos
 
-// Rota GET (Pública)
-router.get('/', function(req, res) {
-    Livro.find({}).populate('autor').exec(function(err, livros) {
-        if (err) return res.status(500).send(err);
-        res.json(livros);
-    });
+/* GET: Lista todos os livros (PÚBLICO - Qualquer um vê) */
+router.get('/', async function(req, res, next) {
+  try {
+    // .populate('autor') preenche os dados do autor automaticamente
+    const livros = await Livro.find().populate('autor');
+    res.render('livros/index', { livros: livros, user: req.user });
+  } catch (err) {
+    next(err);
+  }
 });
 
-// Rota POST (Agora pública para teste - recoloque 'estaLogado' antes da entrega)
-router.post('/', function(req, res) {
-    var novoLivro = new Livro(req.body);
-    novoLivro.save(function(err, livro) {
-        if (err) return res.status(500).send(err);
-        res.json(livro);
-    });
+/* GET: Formulário de cadastro (PROTEGIDO - Só logado acessa) */
+router.get('/novo', checarAutenticacao, async function(req, res) {
+  try {
+    const autores = await Autor.find(); // Precisa dos autores para o <select>
+    res.render('livros/novo', { autores: autores, user: req.user });
+  } catch (err) {
+    res.redirect('/livros');
+  }
 });
 
-// Rota DELETE (Agora pública para teste)
-router.delete('/:id', function(req, res) {
-    Livro.remove({_id: req.params.id}, function(err) {
-        if (err) return res.status(500).send(err);
-        res.json({ mensagem: "Livro deletado!" });
+/* POST: Salvar novo livro (PROTEGIDO) */
+router.post('/', checarAutenticacao, async function(req, res) {
+  try {
+    await Livro.create({
+        titulo: req.body.titulo,
+        ano: req.body.ano,
+        editora: req.body.editora,
+        autor: req.body.autor // Aqui vem o ID do autor selecionado
     });
+    res.redirect('/livros');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/livros/novo');
+  }
+});
+
+/* GET: Deletar livro (PROTEGIDO) */
+router.get('/delete/:id', checarAutenticacao, async function(req, res) {
+    try {
+        await Livro.findByIdAndDelete(req.params.id);
+        res.redirect('/livros');
+    } catch (err) {
+        console.log(err);
+        res.redirect('/livros');
+    }
 });
 
 module.exports = router;

@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users');
 var livrosRouter = require('./routes/livros');
 var cdsRouter = require('./routes/cds');
 var dvdsRouter = require('./routes/dvds');
+var autoresRouter = require('./routes/autores');
 
 // Importação da configuração do passport e base de dados
 require('./config/passport');
@@ -58,6 +59,7 @@ app.use('/users', usersRouter);
 app.use('/livros', livrosRouter);
 app.use('/cds', cdsRouter);
 app.use('/dvds', dvdsRouter);
+app.use('/autores', autoresRouter);
 
 // Tratamento de erros 404
 app.use(function(req, res, next) {
@@ -74,3 +76,13 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+// Middleware de segurança
+function garantirAutenticacao(req, res, next) {
+    // O Passport cria este método .isAuthenticated() automaticamente
+    if (req.isAuthenticated()) {
+        return next(); // Usuário logado? Pode passar.
+    }
+    // Não logado? Manda para o login
+    res.redirect('/login');
+}

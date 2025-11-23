@@ -1,11 +1,8 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-var autorSchema = new Schema({
-    nome: { type: String, required: false },
-    biografia: { type: String, default: '' }
-}, {
-    timestamps: true
+const AutorSchema = new mongoose.Schema({
+    nome: { type: String, required: true },
+    // nacionalidade: String
 });
 
-module.exports = mongoose.model('Autor', autorSchema);
+module.exports = mongoose.model('Autor', AutorSchema);

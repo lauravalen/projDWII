@@ -1,10 +1,15 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-var livroSchema = new Schema({
+const LivroSchema = new mongoose.Schema({
     titulo: { type: String, required: true },
-    autor: { type: mongoose.Schema.Types.ObjectId, ref: 'Autor', required: true },
-    ano: { type: Number }
+    // ano: Number,
+    // editora: String,
+    // Aqui fazemos o relacionamento com o Autor
+    autor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Autor', // Nome exato do modelo acima
+        required: true
+    }
 });
 
-module.exports = mongoose.model('Livro', livroSchema);
+module.exports = mongoose.model('Livro', LivroSchema);
